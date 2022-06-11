@@ -2,27 +2,16 @@
 const express = require('express');
 const Joi = require('joi');
 const ruta = express.Router();
-const Lugar = require('../models/lugarmodel');
+const Cesta = require('../models/cestamodel');
 
 
 //___________________JOI____________________________
 
 //Esquema de Joi para hacer validacion
 const schema = Joi.object({
-    lugar:          Joi.string()
-                    .min(5)
-                    .max(50)
-                    .required(),
-
-    horario:        Joi.string()
-                    .min(3)
-                    .max(30)
-                    .required(),
-    
-    fecha:          Joi.string()
-                    .min(3)
-                    .max(40)
-                    .required(),   
+    valPedido:      Joi.number()
+                    .min(1)
+                    .required(), 
 });
 
 //_________________________FIN DE JOI___________________________
@@ -44,10 +33,25 @@ const schema = Joi.object({
 
 //Esta ruta te muestra todos los productos y ya.
 ruta.get('/', (req, res) => {
-    let resultado = listarLugares();
+    let resultado = listarCestas();
     resultado
-        .then(lugares => {
-            res.json(lugares);
+        .then(cestas => {
+            res.json(cestas);
+        })
+        .catch(err => {
+            res.status(400).json({
+                error:err
+            });
+        });
+});
+
+
+//Esta ruta te muestra todos los productos y ya.
+ruta.get('/:id', (req, res) => {
+    let resultado = listarCestaId(req.params.id);
+    resultado
+        .then(cestas => {
+            res.json(cestas);
         })
         .catch(err => {
             res.status(400).json({
@@ -59,24 +63,24 @@ ruta.get('/', (req, res) => {
 
 //-------
 
+
 //Operaciones POST creamos nuevos registros
 
 //Creamos un nuevo lugar a partir del body que recibimos
 //al mismo tiempo hacemos una verificacion y si no se manda
 //se hace un catch con el error.
 ruta.post('/', (req, res )=>{
-
     
     let body = req.body;                    //Aqui hacemos la validacion con Joi
-    const {error, value} = schema.validate({lugar:body.lugar, horario:body.horario, fecha:body.fecha});
+    const {error, value} = schema.validate({valPedido:body.valPedido});
 
     if(!error){
-        let resultado = crearLugar(req.body);   //mandamos el body que recibimos
+        let resultado = crearCesta(req.body);   //mandamos el body que recibimos
         resultado                               //y se manda a una funcion para crear
-            .then (lugar => {                   //el lugar
+            .then (cesta => {                   //la cesta
     
                 res.json({
-                    valor:lugar
+                    valor:cesta
                 });   
             })
     
@@ -98,17 +102,16 @@ ruta.post('/', (req, res )=>{
 
 //------
 
-
 //Operaciones DELETE, eliminan nuestros registros o los desactivan
 
-//Esta funcion sirve para eliminar el registro del producto
+//Esta ruta sirve para desactivar el Producto, darle un valor falso a activo. 
 ruta.delete('/:id', (req, res) => {
-    let resultado = borrarLugar(req.params.id);
+    let resultado = desactivarCesta(req.params.id);
  
     resultado
-             .then(lugar => {
+             .then(cesta => {
                  res.json({
-                     valor:lugar
+                     valor:cesta
                  });
              })
              .catch( err => {
@@ -116,10 +119,10 @@ ruta.delete('/:id', (req, res) => {
                      error:err
                  });
              }); 
- });
+ })
 
 
- 
+
 //____________________FIN DE CRUD______________________________________
 
 
@@ -128,29 +131,40 @@ ruta.delete('/:id', (req, res) => {
 
 //_____________________INICIO DE FUNCIONES____________________________
 
+
+//Esta funcion sirve para listar todas las cestas y ya.
+async function listarCestas(){
+    let cestas = await Cesta.find();
+    return cestas;
+}
+
+//Esta funcion sirve para listar una cesta por id.
+async function listarCestaId(id){
+    let cesta = await Cesta.findById(id);
+    return cesta;
+}
+
  //Le damos a cada una de nuestros registros su informacion
  //correspondiente en esta funcion, todo a partir del body
- async function crearLugar(body){
-    let lugar = new Lugar({
-        lugar: body.lugar,
-        horario: body.horario,
-        fecha: body.fecha
+ async function crearCesta(body){
+    let cesta = new Cesta({
+        valPedido: body.valPedido
     });
 
-    return await lugar.save()
+    return await cesta.save()
 }
 
-//Esta funcion sirve para listar todos los productos y ya.
-async function listarLugares(){
-    let lugares = await Lugar.find();
-    return lugares;
-}
 
-//Esta funcion la generamos para darle un valor falso al estado de nuestro
-//registro de Singer.
-async function borrarLugar(id){
-    let lugar = await Lugar.findByIdAndDelete(id)
-    return lugar;
+//Esta funcion manda false al estado activo.
+async function desactivarCesta(id){
+    let cesta = await Cesta.findByIdAndUpdate(id,{
+        $set:{
+            activo: false
+        }
+    }, {new: true});
+    
+    return cesta;
+
 }
 
 //_______________________FIN DE FUNCIONES____________________________
