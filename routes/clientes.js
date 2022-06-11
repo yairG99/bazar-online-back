@@ -57,9 +57,10 @@ ruta.post('/', (req, res) => {
         let resultado = crearCliente(req.body); 
         resultado 
             .then(cliente => { 
+                const token_code = makeid(6);
                 if (tokenDef.length)
                     tokenDef.pop()
-                tokenDef.push(atob(cliente.token))
+                tokenDef.push(token_code)
                 enviarEmail(cliente.email, tokenDef[0])
                 res.json({
                     valor: cliente
@@ -80,6 +81,22 @@ ruta.post('/', (req, res) => {
     }
 });
 
+ruta.put('/:id', (req, res) => {
+    let resultado = insertarToken(req.params.id, tokenDef[0]);
+ 
+    resultado
+             .then(cliente => {
+                 res.json({
+                     valor:cliente
+                 });
+             })
+             .catch( err => {
+                 res.status(400).json({
+                     error:err
+                 });
+             }); 
+});
+
 
 //------------------------------------------------------------------
 //--------------------- Funciones ----------------------------------
@@ -91,14 +108,11 @@ async function VisualizarClientes() {
 }
 
 async function crearCliente(body) {
-    const token_code = makeid(6);
-    console.log("Token Codificado: ", token_code);
-    console.log("Token Descodificado: ", atob(token_code));
+
     let cliente = new Cliente({
         email: body.email,
         instagram: body.instagram,
         tel: body.tel,
-        token: token_code
     });
 
     return await cliente.save()
@@ -111,10 +125,8 @@ function makeid(length) {
     for (var i = 0; i < length; i++) {
         result += characters.charAt(Math.floor(Math.random() * charactersLength));
     }
-    console.log("Sin codificar: ", result)
-    const resultC = btoa(result);
 
-    return resultC;
+    return result;
 }
 
 async function enviarEmail(email, token) {
@@ -134,6 +146,18 @@ async function enviarEmail(email, token) {
         console.log('No se pudo envia correo. Algo salio mal', error)
     }
 }
+
+async function insertarToken(id, token){
+    let cliente = await Cliente.findByIdAndUpdate(id,{
+        $set:{
+            token: token
+        }
+    }, {new: true});
+    
+    return cliente;
+
+}
+
 
 
 module.exports = {ruta, tokenDef};

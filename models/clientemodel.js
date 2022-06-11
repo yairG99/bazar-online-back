@@ -14,7 +14,6 @@ const clienteSchema = mongoose.Schema({
     },
     token: {
         type: String,
-        required: true
     }
 });
 
