@@ -8,6 +8,8 @@ require('dotenv').config()
 //IMPORTAR NUESTRA RUTAS
 const productos = require('./routes/productos')
 const lugares = require('./routes/lugares')
+const clientes = require('./routes/clientes')
+const dashboard = require('./routes/dashboard')
 
 
 //________________________________________________VARIABLES_____________________________________________________
@@ -34,6 +36,8 @@ app.use(cors(corsOptions))
 //Contenido de nuestras Rutas
 app.use('/api/productos', productos);
 app.use('/api/lugares', lugares);
+app.use('/api/clientes', clientes.ruta);
+app.use('/api/dashboard', dashboard)
 
 //__________________________CONEXIONES_______________________________________
 
