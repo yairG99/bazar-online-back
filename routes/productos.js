@@ -44,7 +44,7 @@ const schemaTtl = Joi.object({
                     .required(),
 });
 
-//Esquema de Joi para hacer validacion para title independiente
+//Esquema de Joi para hacer validacion para precio independiente
 const schemaPrc = Joi.object({
     price:          Joi.number()
                     .required(),
