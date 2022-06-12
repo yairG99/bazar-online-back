@@ -9,7 +9,7 @@ const Producto = require('../models/productomodel');
 //Esquema de Joi para hacer validacion
 const schema = Joi.object({
     src:            Joi.string()
-                    .min(10)
+                    .min(5)
                     .max(45)
                     .required(),
 
@@ -93,6 +93,20 @@ ruta.get('/todos', (req, res) => {
     resultado
         .then(productos => {
             res.json(productos);
+        })
+        .catch(err => {
+            res.status(400).json({
+                error:err
+            });
+        });
+});
+
+//Esta ruta muestra un producto con cierto id  
+ruta.get('/:id', (req, res) => {
+    let resultado = productoId(req.params.id);
+    resultado
+        .then(producto => {
+            res.json(producto);
         })
         .catch(err => {
             res.status(400).json({
@@ -324,11 +338,16 @@ async function listarProductosActivos(){
     return productos;
 }
 
-
 //Esta funcion sirve para listar todos los productos y ya.
 async function listarProductos(){
     let productos = await Producto.find();
     return productos;
+}
+
+//Esta funcion te muestra un producto con cierto id
+async function productoId(id){
+    let producto = await Producto.find({"_id":id});
+    return producto;
 }
 
 

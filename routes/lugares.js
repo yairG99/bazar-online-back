@@ -56,6 +56,20 @@ ruta.get('/', (req, res) => {
         });
 });
 
+//Esta ruta nos regresará un lugar con un cierto id
+ruta.get('/:id', (req, res) => {
+    let resultado = LugarId(req.params.id);
+    resultado
+        .then(lugar => {
+            res.json(lugar);
+        })
+        .catch(err => {
+            res.status(400).json({
+                error:err
+            });
+        });
+});
+
 
 //-------
 
@@ -152,6 +166,13 @@ async function borrarLugar(id){
     let lugar = await Lugar.findByIdAndDelete(id)
     return lugar;
 }
+
+//Funcion para encontrar un lugar con un cierto id
+async function LugarId(id){
+    let lugar = await Lugar.find({"_id":id});
+    return lugar;
+}
+
 
 //_______________________FIN DE FUNCIONES____________________________
 

@@ -43,6 +43,19 @@ ruta.get('/', (req, res) => {
         });
 });
 
+ruta.get('/:id', (req, res) => {
+    let resultado = ClienteId(req.params.id);
+    resultado
+        .then(cliente => {
+            res.json(cliente);
+        })
+        .catch(err => {
+            res.status(400).json({
+                error: err
+            });
+        });
+});
+
 // Crear un cliente nuevo
 ruta.post('/', (req, res) => {
 
@@ -126,13 +139,15 @@ async function enviarEmail(email, token) {
                 token: token
             }
           });
-          console.log(`Correo Enviado a : ${email} ` );
+        console.log(`Correo Enviado a : ${email} ` );
     } catch (error){
         console.log('No se pudo envia correo. Algo salio mal', error)
     }
 }
 
-
-
+async function ClienteId(id){
+    let cliente = await Cliente.find({"_id":id});
+    return cliente;
+}
 
 module.exports = {ruta, tokenDef};
