@@ -12,6 +12,7 @@ const cestas = require('./routes/cestas')
 const registroCestas = require('./routes/registroCestas')
 const clientes = require('./routes/clientes')
 const dashboard = require('./routes/dashboard')
+const ordenes = require('./routes/ordenes')
 
 
 //________________________________________________VARIABLES_____________________________________________________
@@ -41,7 +42,8 @@ app.use('/api/lugares', lugares);
 app.use('/api/cestas', cestas);
 app.use('/api/registrocestas', registroCestas);
 app.use('/api/clientes', clientes.ruta);
-app.use('/api/dashboard', dashboard)
+app.use('/api/dashboard', dashboard);
+app.use('/api/ordenes', ordenes);
 
 //__________________________CONEXIONES_______________________________________
 
