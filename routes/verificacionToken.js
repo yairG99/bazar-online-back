@@ -2,6 +2,7 @@ const express = require('express');
 const Joi = require('joi');
 const ruta = express.Router();
 const clientes = require('./clientes');
+const Cliente = require('../models/clientemodel');
 const jwt = require("jsonwebtoken");
 const tokenDef = clientes.tokenDef;
 
@@ -23,16 +24,26 @@ ruta.post("/login", (req, res) => {
 
 });
 
-ruta.post("/posts", verifyToken, (req, res) => {
+ruta.post("/posts/:id", verifyToken, (req, res) => {
     
     jwt.verify(req.token, tokenDef[0], (error, authData) => {
         if (error) {
             res.sendStatus(403);
         } else {
-            res.json({
-                mensaje: "Post fue creado",
-                authData
-            });
+            
+            let resultado = insertarVerify(req.params.id);
+ 
+            resultado
+                    .then(cliente => {
+                        res.json({
+                            valor:cliente
+                        });
+                    })
+                    .catch( err => {
+                        res.status(400).json({
+                            error:err
+                        });
+                    }); 
         }
     });
 });
@@ -48,6 +59,18 @@ function verifyToken(req, res, next) {
     } else {
         res.sendStatus(403);
     }
+}
+
+
+async function insertarVerify(id){
+    let cliente = await Cliente.findByIdAndUpdate(id,{
+        $set:{
+            verificado: true
+        }
+    }, {new: true});
+    
+    return cliente;
+
 }
 
 module.exports = ruta;

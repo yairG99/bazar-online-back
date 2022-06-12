@@ -81,21 +81,6 @@ ruta.post('/', (req, res) => {
     }
 });
 
-ruta.put('/:id', (req, res) => {
-    let resultado = insertarToken(req.params.id, tokenDef[0]);
- 
-    resultado
-             .then(cliente => {
-                 res.json({
-                     valor:cliente
-                 });
-             })
-             .catch( err => {
-                 res.status(400).json({
-                     error:err
-                 });
-             }); 
-});
 
 
 //------------------------------------------------------------------
@@ -147,16 +132,6 @@ async function enviarEmail(email, token) {
     }
 }
 
-async function insertarToken(id, token){
-    let cliente = await Cliente.findByIdAndUpdate(id,{
-        $set:{
-            token: token
-        }
-    }, {new: true});
-    
-    return cliente;
-
-}
 
 
 

@@ -12,8 +12,9 @@ const clienteSchema = mongoose.Schema({
         type: Number,
         required: true
     },
-    token: {
-        type: String,
+    verificado: {
+        type: Boolean,
+        default: false
     }
 });
 
