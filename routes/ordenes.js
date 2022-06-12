@@ -51,6 +51,19 @@ ruta.get('/', (req, res) => {
 });
 
 
+ruta.get('/:id', (req, res) => {
+    let resultado = OrdenesId(req.params.id);
+    resultado
+        .then(orden => {
+            res.json(orden);
+        })
+        .catch(err => {
+            res.status(400).json({
+                error:err
+            });
+        });
+});
+
 //-------
 
 //Operaciones POST creamos nuevos registros
@@ -159,6 +172,12 @@ async function desactivarOrden(id){
     
     return orden;
 
+}
+
+
+async function OrdenesId(id){
+    let orden = await Orden.find({"_id":id});
+    return orden;
 }
 
 
